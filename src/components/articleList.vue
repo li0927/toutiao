@@ -29,6 +29,7 @@
 <script>
 import { getRecoArticles } from '@/api/articles.js'
 import ArticleItem from './articleItem.vue'
+import { mapState } from 'vuex'
 export default {
   name: 'ArticleList',
   components: { ArticleItem },
@@ -46,7 +47,9 @@ export default {
       refreshSucText: ''
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
   watch: {},
   created() {},
   mounted() {},
@@ -56,12 +59,18 @@ export default {
       // setTimeout 仅做示例，真实场景中一般为 ajax 请求
       // 加载状态结束 this.loading = false
       // 数据全部加载完成 this.finished = true
+      console.log('来了')
       getRecoArticles({
         channel_id: this.channel.id,
         timestamp: this.timestamp ? this.timestamp : Date.now(),
         with_top: 1
       })
         .then(({ data: { data: res } }) => {
+          console.log('成功了', {
+            channel_id: this.channel.id,
+            timestamp: this.timestamp ? this.timestamp : Date.now(),
+            with_top: 1
+          })
           console.log(res)
           this.list.push(...res.results)
           this.loading = false
@@ -77,6 +86,11 @@ export default {
           // }
         })
         .catch(() => {
+          console.log('失败了', {
+            channel_id: this.channel.id,
+            timestamp: this.timestamp ? this.timestamp : Date.now(),
+            with_top: 1
+          })
           this.error = true
           this.loading = false
         })
@@ -113,7 +127,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-// 移动端vh和vw分别相当于布局布局视口高宽的百分之一,是响应式的,给元素设置一个高度，滚动式就可以被浏览器检测到，否则会默认是body在滚动
+// 移动端vh和vw分别相当于布局布局视口高宽的百分之一,是响应式的,给元素设置一个高度，滚动时就可以被浏览器检测到，否则会默认是body在滚动
 .article-list {
   height: 80vh;
   overflow-y: auto;

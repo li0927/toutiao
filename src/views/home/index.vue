@@ -6,7 +6,12 @@
       </template>
     </van-nav-bar>
     <van-tabs v-model="active" animated swipeable>
-      <van-tab :title="v.name" v-for="v in userChannelList" :key="v.id">
+      <van-tab
+        :title="v.name"
+        v-for="(v, index) in userChannelList"
+        :key="v.id"
+        @click="refreshActive(index)"
+      >
         <article-list class="article" :channel="v"></article-list>
       </van-tab>
       <div class="space" slot="nav-right"></div>
@@ -34,8 +39,15 @@
       position="bottom"
       close-icon-position="top-left"
       :style="{ height: '100%' }"
+      @closed="refreshUserChannelList"
     >
-      <channel-edit></channel-edit>
+      <channel-edit
+        :myChannels="userChannelList"
+        :active="active"
+        @addChannel="addChannel"
+        @delChannel="delChannel"
+        @uptActiveInd="uptActive"
+      ></channel-edit>
     </van-popup>
   </div>
 </template>
@@ -44,6 +56,8 @@
 import { getUserChannelList } from '@/api/user.js'
 import ArticleList from '../../components/articleList.vue'
 import ChannelEdit from '../../components/channelEdit.vue'
+import { mapState } from 'vuex'
+import { getItem } from '@/plugins/storage.js'
 export default {
   name: 'HomePage',
   components: {
@@ -54,12 +68,14 @@ export default {
   data() {
     return {
       value: '',
-      active: 5,
+      active: 0,
       userChannelList: [],
       popupIsShow: false
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
   watch: {},
   created() {
     this.getUserChannelList()
@@ -67,11 +83,30 @@ export default {
   mounted() {},
   methods: {
     getUserChannelList() {
-      getUserChannelList().then(({ data: { data: res } }) => {
-        console.log(res.channels)
-        this.userChannelList = res.channels
+      if (this.user) {
+        getUserChannelList().then(({ data: { data: res } }) => {
+          console.log(res.channels)
+          this.userChannelList = res.channels
+        })
+      } else {
+        this.userChannelList = getItem('my-channels', false)
+          ? getItem('my-channels', false)
+          : [{ id: 0, name: '推荐' }]
+      }
+    },
+    uptActive(index) {
+      this.active = index
+    },
+    addChannel(e) {
+      console.log(e)
+      this.userChannelList.push(e)
+    },
+    delChannel(e) {
+      this.userChannelList = this.userChannelList.filter((v) => {
+        return v.id !== e.id
       })
-    }
+    },
+    refreshUserChannelList() {}
   }
 }
 </script>
