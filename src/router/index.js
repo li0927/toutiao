@@ -10,8 +10,13 @@ const routes = [
     component: () => import('@/views/login')
   },
   {
+    path: '/search',
+    name: 'SearchPage',
+    component: () => import('@/views/search')
+  },
+  {
     path: '/',
-    // name: 'layout',折了默认子路由就不需要起名字
+    // name: 'layout',设置了默认子路由就不需要起名字
     component: () => import('@/views/layout'),
     children: [
       // 默认子路由，path属性为空，只有一个

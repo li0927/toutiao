@@ -86,11 +86,7 @@ export default {
           // }
         })
         .catch(() => {
-          console.log('失败了', {
-            channel_id: this.channel.id,
-            timestamp: this.timestamp ? this.timestamp : Date.now(),
-            with_top: 1
-          })
+          console.log('失败了')
           this.error = true
           this.loading = false
         })
